@@ -22,6 +22,7 @@ const ReactPlayer = dynamic(() => import("react-player"), {
 
 // Make sure your background image is placed in src/assets/bg.png
 import bgImage from "../assets/bg.png";
+import mobileBgImage from "../assets/mobilebg.png";
 
 const stations = [
   {
@@ -612,8 +613,6 @@ export default function Page() {
   const [floatingChais, setFloatingChais] = useState<
     { id: number; x: number }[]
   >([]);
-  const [isStopped, setIsStopped] = useState(false);
-  const [isPulling, setIsPulling] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
 
   const audioContext = useRef<AudioContext | null>(null);
@@ -700,14 +699,12 @@ export default function Page() {
   function handleBoard() {
     clickSound();
     setBoarded(true);
-    setIsStopped(false);
     setPlaying(true);
     tell(`Now playing: ${currentStation.title}`);
   }
 
   function togglePlay() {
     clickSound();
-    setIsStopped(false);
     setPlaying((value) => !value);
   }
 
@@ -724,21 +721,6 @@ export default function Page() {
     setTimeout(() => {
       setFloatingChais((prev) => prev.filter((item) => item.id !== id));
     }, 2000);
-  }
-
-  function handleChainPull() {
-    if (!boarded || isPulling) return;
-    clickSound();
-
-    // The pull animation and the pause happen together — the chain
-    // yanking down IS what silences the music, not a side effect of it.
-    setIsPulling(true);
-    setPlaying(false);
-    tell("Chain pulled. The train is stopped.");
-
-    setIsStopped(true);
-    setTimeout(() => setIsPulling(false), 650);
-    setTimeout(() => setIsStopped(false), 3500);
   }
 
   function changeStation(direction: number) {
@@ -759,7 +741,6 @@ export default function Page() {
   function selectStation(index: number) {
     if (!boarded || index === stationIndex) return;
     clickSound();
-    setIsStopped(false);
     setStationIndex(index);
     setPlaying(true);
     tell(`Tuned to: ${stations[index].title}`);
@@ -787,11 +768,6 @@ export default function Page() {
         aria-hidden="true"
       />
 
-      {/* Emergency stop red flashing overlay */}
-      {isStopped && (
-        <div className="absolute inset-0 bg-red-600/20 animate-pulse pointer-events-none z-30 mix-blend-overlay" />
-      )}
-
       {/* HEADER */}
       <header className="topbar absolute top-0 w-full z-50 flex flex-wrap items-center justify-between gap-2 px-3 sm:px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:py-4 bg-gradient-to-b from-black/80 sm:from-black/60 to-transparent text-white">
         <div className="station-time text-xs sm:text-sm font-medium tracking-widest uppercase whitespace-nowrap bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
@@ -800,8 +776,8 @@ export default function Page() {
 
         <div className="top-actions flex items-center justify-end gap-1 sm:gap-2">
           <a
-            className="platform-link spotify-link items-center justify-center w-9 h-9 sm:w-10 sm:h-10 hover:text-green-400 rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-300 active:scale-95 hidden sm:flex"
-            href="https://open.spotify.com/playlist/3IpDoXyKOPgxJvUJYsagyM"
+            className="platform-link spotify-link items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-300 active:scale-95 hidden sm:flex"
+            href="https://open.spotify.com/playlist/0rXkrKD5eOVn4sVdOqceCx?si=p9ifxdQcSk6r-qoiv_sbxQ&utm_source=native-share-menu&pi=ojwT_U2GQFOhL&nd=1&dlsi=2826cc5ff16a46e9"
             target="_blank"
             rel="noreferrer"
             aria-label="Spotify"
@@ -811,7 +787,7 @@ export default function Page() {
             </svg>
           </a>
           <a
-            className="platform-link youtube-link items-center justify-center w-9 h-9 sm:w-10 sm:h-10 hover:text-red-500 rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-300 active:scale-95 hidden sm:flex"
+            className="platform-link youtube-link items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-300 active:scale-95 hidden sm:flex"
             href="https://music.youtube.com"
             target="_blank"
             rel="noreferrer"
@@ -884,12 +860,21 @@ export default function Page() {
         <div
           className={`scene-motion absolute -inset-2 -z-10 ${reduceMotion ? "" : "animate-train-drift"}`}
         >
+          {/* Desktop background */}
           <Image
             src={bgImage}
             alt="Sleeper Class Background"
             fill
             priority
-            className="object-cover object-center"
+            className="object-cover object-center hidden sm:block"
+          />
+          {/* Mobile background */}
+          <Image
+            src={mobileBgImage}
+            alt="Sleeper Class Background (Mobile)"
+            fill
+            priority
+            className="object-cover object-center sm:hidden"
           />
         </div>
         <div className="absolute inset-0 bg-black/10 -z-10" />
@@ -903,38 +888,13 @@ export default function Page() {
         )}
       </section>
 
-      {/* EMERGENCY CHAIN */}
-      <button
-        className={`chain-wrap absolute right-2 sm:right-6 top-[22%] sm:top-1/3 z-40 flex flex-col items-center scale-90 sm:scale-100 group transition-transform duration-300 ${
-          isStopped && !isPulling ? "translate-y-3" : ""
-        } ${!isPulling && !isStopped ? "hover:scale-105 active:scale-95" : ""} ${
-          boarded ? "" : "opacity-40 pointer-events-none"
-        }`}
-        aria-label="Pull emergency chain to stop the music"
-        aria-disabled={!boarded}
-        onClick={handleChainPull}
-      >
-        <span
-          className={`chain-handle origin-top bg-red-600/90 backdrop-blur-md border border-red-400/50 shadow-[0_0_15px_rgba(220,38,38,0.5)] text-white text-[10px] sm:text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded group-hover:bg-red-500 transition-colors ${
-            isPulling && !reduceMotion ? "animate-chain-handle" : ""
-          }`}
-        >
-          STOP
-        </span>
-        <span
-          className={`chain-line origin-top w-1.5 h-14 sm:h-24 bg-gradient-to-b from-red-800 to-red-900 shadow-inner ${
-            isPulling && !reduceMotion ? "animate-chain-pull" : ""
-          }`}
-        />
-      </button>
-
       {/* PLAYER DOCK */}
       <section
-        className="player-dock absolute bottom-0 w-full z-50 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 px-3 sm:px-10 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:pb-8 pt-8 sm:pt-12 bg-gradient-to-t from-black/95 via-black/80 to-transparent text-white"
+        className="player-dock absolute bottom-0 w-full z-50 flex flex-col md:flex-row items-start md:items-center md:justify-between gap-4 md:gap-6 px-3 sm:px-10 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:pb-8 pt-12 sm:pt-16 bg-gradient-to-t from-black/95 via-black/80 to-transparent text-white"
         aria-label="Audio player"
       >
         {/* Left: track info */}
-        <div className="flex items-center gap-3 sm:gap-4 w-full md:flex-1 justify-center md:justify-start">
+        <div className="flex items-center gap-3 sm:gap-4 w-full md:flex-1 justify-start">
           <div className="artwork-container w-12 h-12 flex-shrink-0 relative hidden sm:block">
             {/* The Disk Container */}
             <div className="w-12 h-12 rounded-full overflow-hidden border border-white/20 shadow-lg relative bg-black flex items-center justify-center">
@@ -971,7 +931,7 @@ export default function Page() {
         </div>
 
         {/* Center: Transport Controls + Playback Line */}
-        <div className="transport flex flex-col items-center gap-3 w-full md:flex-1">
+        <div className="transport flex flex-col items-start md:items-center gap-3 w-full md:flex-1">
           <div className="flex items-center gap-6">
             <button
               aria-label="Previous Station"
@@ -1012,7 +972,7 @@ export default function Page() {
           </div>
         </div>
         {/* Right: volume + chai */}
-        <div className="sound-controls flex items-center justify-between md:justify-end gap-2 sm:gap-4 w-full md:flex-1 px-1 sm:px-0">
+        <div className="sound-controls flex items-center justify-start md:justify-end gap-2 sm:gap-4 w-full md:flex-1 px-1 sm:px-0">
           <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
             <button
               aria-label={muted ? "Unmute" : "Mute"}
@@ -1053,16 +1013,15 @@ export default function Page() {
                   transform: `translateX(calc(-50% + ${cup.x}px))`,
                 }}
               >
-                ☕
+                ☕️
               </div>
             ))}
-
             <button
               className="group flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium text-white whitespace-nowrap bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 hover:border-white/40 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 ease-out"
               onClick={handleChaiClick}
             >
               <span className="text-orange-300 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
-                ₹
+                ☕️
               </span>
               <span className="tracking-wide hidden xs:inline">Chai</span>
               <span className="flex items-center justify-center bg-black/30 px-2 py-0.5 rounded-full text-[10px] font-bold border border-white/10 shadow-inner group-hover:bg-black/50 transition-colors duration-300">
@@ -1217,55 +1176,9 @@ export default function Page() {
           animation: light-sweep 9s ease-in infinite;
         }
 
-        /* Chain handle jerks down and settles */
-        @keyframes chain-handle-pull {
-          0% {
-            transform: translateY(0) rotate(0deg);
-          }
-          25% {
-            transform: translateY(10px) rotate(-3deg);
-          }
-          45% {
-            transform: translateY(14px) rotate(2deg);
-          }
-          65% {
-            transform: translateY(6px) rotate(-1deg);
-          }
-          100% {
-            transform: translateY(0) rotate(0deg);
-          }
-        }
-        .animate-chain-handle {
-          animation: chain-handle-pull 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        /* Chain line stretches taut, then snaps back with a little overshoot */
-        @keyframes chain-line-pull {
-          0% {
-            transform: scaleY(1);
-          }
-          30% {
-            transform: scaleY(1.32);
-          }
-          55% {
-            transform: scaleY(0.94);
-          }
-          75% {
-            transform: scaleY(1.06);
-          }
-          100% {
-            transform: scaleY(1);
-          }
-        }
-        .animate-chain-pull {
-          animation: chain-line-pull 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
         @media (prefers-reduced-motion: reduce) {
           .animate-train-drift,
-          .animate-light-sweep,
-          .animate-chain-handle,
-          .animate-chain-pull {
+          .animate-light-sweep {
             animation: none;
           }
         }

@@ -13,6 +13,15 @@ const devanagari = Noto_Serif_Devanagari({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sleeperclass.wtf"),
+  icons: {
+    shortcut: "/favicon.ico",
+    icon: [
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
   title: "स्लीपर क्लास | SleeperClass.wtf — Indian train night radio",
   description:
     "A dreamy Indian sleeper train radio for night journeys, window seats, ambient music, and the long way home.",

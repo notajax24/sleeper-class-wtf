@@ -12,6 +12,7 @@ const ReactPlayer = dynamic(() => import("react-player"), {
 // Assuming the updated 9:16 vertical rain image is saved as bg.png
 import bgImage from "../assets/bg.png";
 import mobileBgImage from "../assets/bgmobile.png"; // Your new 9:16 mobile image
+import RainEffect from "@/components/RainEffect";
 // Load the Devanagari font for the massive headline
 const notoDevanagari = Noto_Sans_Devanagari({
   subsets: ["devanagari"],
@@ -810,7 +811,7 @@ export default function Page() {
           priority
           className="object-cover object-center opacity-80 hidden md:block"
         />
-
+        <RainEffect />
         {/* Mobile Background (Visible on mobile, hidden on medium+ screens) */}
         <Image
           src={mobileBgImage}

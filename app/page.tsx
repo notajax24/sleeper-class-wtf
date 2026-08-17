@@ -22,6 +22,11 @@ const notoDevanagari = Noto_Sans_Devanagari({
 
 const stations = [
   {
+    videoId: "fbx6ULRrhXg",
+    title: "AMBARSARIYA",
+    artist: "Sona Mohapatra",
+  },
+  {
     videoId: "piUHBTXsoiY",
     title: "Raabta",
     artist: "Pritam",
@@ -107,19 +112,9 @@ const stations = [
     artist: "Labh Janjua",
   },
   {
-    videoId: "XAJSWVvgR2M",
-    title: "Abhi Toh Party Shuru Hui Hai",
-    artist: "Aastha Gill",
-  },
-  {
     videoId: "pwKmLIPvEjI",
     title: "Badtameez Dil",
     artist: "Shefali Alvares",
-  },
-  {
-    videoId: "fbx6ULRrhXg",
-    title: "AMBARSARIYA",
-    artist: "Sona Mohapatra",
   },
   {
     videoId: "lSPNH_rYKIg",
@@ -709,6 +704,7 @@ export default function Page() {
   const [stationIndex, setStationIndex] = useState(0);
   const [notice, setNotice] = useState("");
   const [isBuffering, setIsBuffering] = useState(false);
+  const [currentTime, setCurrentTime] = useState("");
 
   const audioContext = useRef<AudioContext | null>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -716,6 +712,21 @@ export default function Page() {
 
   const currentStation = stations[stationIndex];
 
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(
+        now.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        }),
+      );
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 60000); // Update every minute
+    return () => clearInterval(timer);
+  }, []);
   // Supress React Player AbortError noise
   useEffect(() => {
     const handleRejection = (event: PromiseRejectionEvent) => {
@@ -811,7 +822,6 @@ export default function Page() {
           priority
           className="object-cover object-center opacity-80 hidden md:block"
         />
-        <RainEffect />
         {/* Mobile Background (Visible on mobile, hidden on medium+ screens) */}
         <Image
           src={mobileBgImage}
@@ -820,6 +830,7 @@ export default function Page() {
           priority
           className="object-cover object-center opacity-80 block md:hidden"
         />
+        <RainEffect />
 
         {/* Gradient Overlay for player legibility */}
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/20 via-black/40 to-black/95"></div>
@@ -846,28 +857,41 @@ export default function Page() {
       {/* UI Overlay */}
       <div className="relative z-10 w-full h-full flex flex-col justify-between px-[24px] py-[24px]">
         {/* Top Navigation Bar */}
-        <header className="flex items-center justify-between w-full pt-[max(1rem,env(safe-area-inset-top))]">
-          {/* Status Badge: Online */}
-          <div className="flex items-center gap-[6px] bg-transparent border border-white/20 rounded-[9999px] px-[14px] py-[8px] pl-[12px] backdrop-blur-md">
-            <div className="w-2.5 h-2.5 rounded-[9999px] bg-[#4ade80] shadow-[0_0_8px_0_rgba(74,222,128,0.9)] animate-pulse"></div>
-            <span className="text-[#ffffff] text-[14px] font-[500] leading-[20px]">
-              1,204 online
-            </span>
+        {/* Top Navigation Bar */}
+        <header className="relative z-50 flex items-center justify-between w-full pt-[max(1rem,env(safe-area-inset-top))]">
+          {/* Left Side: Time and Online Status */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Live Time Badge */}
+            <div className="bg-transparent px-[12px] py-[8px]">
+              <span className="text-[#ffffff] text-[12px] sm:text-[14px] font-[500] tracking-wide whitespace-nowrap">
+                {currentTime || "12:00 PM"}
+              </span>
+            </div>
+
+            {/* Status Badge: Online (Text hides on very small screens to save space) */}
+            <div className="flex items-center gap-[6px] bg-transparent border border-white/20 rounded-[9999px] px-[10px] sm:px-[14px] py-[8px] backdrop-blur-md">
+              <div className="w-2.5 h-2.5 flex-shrink-0 rounded-[9999px] bg-[#4ade80] shadow-[0_0_8px_0_rgba(74,222,128,0.9)] animate-pulse"></div>
+              <span className="text-[#ffffff] text-[12px] sm:text-[14px] font-[500] leading-[20px] whitespace-nowrap hidden sm:inline">
+                104 online
+              </span>
+            </div>
           </div>
 
           {/* External Links */}
-          <nav className="flex items-center gap-[22px] mr-[max(1rem,env(safe-area-inset-right))]">
+          <nav className="flex items-center gap-[16px] sm:gap-[22px] mr-[max(0.5rem,env(safe-area-inset-right))]">
             <a
-              href="https://open.spotify.com/"
+              href="https://open.spotify.com/playlist/0rXkrKD5eOVn4sVdOqceCx"
               target="_blank"
               rel="noreferrer"
-              className="group flex items-center gap-[8px] text-[#ffffff] text-[14px] font-[500] bg-transparent hover:opacity-80 transition-opacity"
+              className="group flex items-center gap-[8px] text-[#ffffff] font-[500] bg-transparent hover:opacity-80 transition-opacity"
+              aria-label="Spotify"
             >
-              Spotify
+              {/* Text hidden on mobile (sm breakpoint) */}
+              <span className="hidden sm:inline text-[14px]">Spotify</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 fill="currentColor"
                 className="bi bi-spotify"
                 viewBox="0 0 16 16"
@@ -875,17 +899,20 @@ export default function Page() {
                 <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.669 11.538a.5.5 0 0 1-.686.165c-1.879-1.147-4.243-1.407-7.028-.77a.499.499 0 0 1-.222-.973c3.048-.696 5.662-.397 7.77.892a.5.5 0 0 1 .166.686m.979-2.178a.624.624 0 0 1-.858.205c-2.15-1.321-5.428-1.704-7.972-.932a.625.625 0 0 1-.362-1.194c2.905-.881 6.517-.454 8.986 1.063a.624.624 0 0 1 .206.858m.084-2.268C10.154 5.56 5.9 5.419 3.438 6.166a.748.748 0 1 1-.434-1.432c2.825-.857 7.523-.692 10.492 1.07a.747.747 0 1 1-.764 1.288" />
               </svg>
             </a>
+
             <a
               href="https://music.youtube.com/watch?v=Mmu-tj-psuk"
               target="_blank"
               rel="noreferrer"
-              className="group flex items-center gap-[8px] text-[#ffffff] text-[14px] font-[500] bg-transparent hover:opacity-80 transition-opacity"
+              className="group flex items-center gap-[8px] text-[#ffffff] font-[500] bg-transparent hover:opacity-80 transition-opacity"
+              aria-label="YouTube Music"
             >
-              YT Music
+              {/* Text hidden on mobile (sm breakpoint) */}
+              <span className="hidden sm:inline text-[14px]">YT Music</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 fill="currentColor"
                 className="bi bi-youtube"
                 viewBox="0 0 16 16"

@@ -24,14 +24,15 @@ export default function RainEffect() {
     // Initialize raindrops
     const init = () => {
       raindrops = [];
-      for (let i = 0; i < 150; i++) {
-        // Number of drops
+      for (let i = 0; i < 200; i++) {
+        // Increased slightly to fill the space
         raindrops.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          l: Math.random() * 1 + 10, // Length of drop
-          xs: -4 + Math.random() * 4 + 2, // Horizontal speed/slant
-          ys: Math.random() * 5 + 20, // Vertical speed
+          // DRASTICALLY REDUCED size and speed for a slow, small drizzle
+          l: Math.random() * 13 + 0.5, // Very short drop length multiplier
+          xs: Math.random() * 1 - 0.5, // Very gentle horizontal drift (nearly straight down)
+          ys: Math.random() * 3 + 4, // Very slow vertical falling speed (4 to 7 px per frame)
         });
       }
     };
@@ -39,8 +40,8 @@ export default function RainEffect() {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       // Cinematic subtle rain color (semi-transparent white/blue)
-      ctx.strokeStyle = "rgba(174, 194, 224, 0.25)";
-      ctx.lineWidth = 0.3;
+      ctx.strokeStyle = "rgba(174, 194, 224, 0.35)"; // Slightly boosted opacity since drops are smaller
+      ctx.lineWidth = 0.5; // Slightly thicker so the tiny drops remain visible
       ctx.lineCap = "round";
 
       for (let i = 0; i < raindrops.length; i++) {

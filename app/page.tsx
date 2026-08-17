@@ -830,8 +830,8 @@ export default function Page() {
           priority
           className="object-cover object-center opacity-80 block md:hidden"
         />
-        <RainEffect />
 
+        <RainEffect />
         {/* Gradient Overlay for player legibility */}
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/20 via-black/40 to-black/95"></div>
       </div>

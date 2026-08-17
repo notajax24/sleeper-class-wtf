@@ -1,619 +1,713 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Info,
-  Pause,
-  Play,
-  Radio,
-  SkipBack,
-  SkipForward,
-  TrainFront,
-  Volume2,
-  VolumeX,
-  X,
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { Noto_Sans_Devanagari } from "next/font/google";
 
 const ReactPlayer = dynamic(() => import("react-player"), {
   ssr: false,
 }) as any;
 
-// Make sure your background image is placed in src/assets/bg.png
+// Assuming the updated 9:16 vertical rain image is saved as bg.png
 import bgImage from "../assets/bg.png";
-import mobileBgImage from "../assets/mobilebg.png";
+import mobileBgImage from "../assets/bgmobile.png"; // Your new 9:16 mobile image
+// Load the Devanagari font for the massive headline
+const notoDevanagari = Noto_Sans_Devanagari({
+  subsets: ["devanagari"],
+  weight: ["800"],
+  display: "swap",
+});
 
 const stations = [
   {
-    videoId: "sOhESxhibAM",
-    title:
-      "Safarnama FULL AUDIO Song | Tamasha | Ranbir Kapoor, Deepika Padukone | T-Series",
-    artist: "Tamasha",
+    videoId: "piUHBTXsoiY",
+    title: "Raabta",
+    artist: "Pritam",
   },
   {
-    videoId: "2mWaqsC3U7k",
-    title:
-      "ROCKSTAR: Phir Se Ud Chala (Full Song) | Ranbir Kapoor, Nargis Fakhri | A. R. Rahman, Mohit Chauhan",
-    artist: "Rockstar",
+    videoId: "r9eGi0rVxBw",
+    title: "KABHI KABHI ADITI",
+    artist: "Rashid Ali Warbartan",
   },
   {
-    videoId: "BArlCOQ__ug",
-    title:
-      "Shiv Kailashon Ke Vasi | Laman | Bhole Baba | Official song | Folk Himachal | Shankar Sankat Harna",
-    artist: "Laman",
+    videoId: "3E1NLVzDZ_Y",
+    title: "Tujh Mein Rab Dikhta Hai",
+    artist: "Roop Kumar Rathod",
   },
   {
-    videoId: "s8aAlUynpEY",
-    title:
-      'Highway: "Maahi Ve" Full Song with lyrics | Alia Bhatt, Randeep Hooda | A.R Rahman',
-    artist: "Highway",
+    videoId: "InD68CDGT9Q",
+    title: "Mast Magan",
+    artist: "Arijit Singh",
   },
   {
-    videoId: "PlIoHp6v3LI",
-    title:
-      "Shiv kailasho ke Vasi || Official Music Video || Hansraj Raghuwanshi || Baba Ji",
-    artist: "Hansraj Raghuwanshi",
+    videoId: "cK9h5PVzRpk",
+    title: "GUZARISH",
+    artist: "Javed Ali",
   },
   {
-    videoId: "fdubeMFwuGs",
-    title:
-      "Ilahi Full Video Song | Yeh Jawaani Hai Deewani | Ranbir Kapoor, Deepika Padukone | Pritam",
-    artist: "Yeh Jawaani Hai Deewani",
+    videoId: "3chj4ooasmE",
+    title: "Mere Bina",
+    artist: "Pritam",
   },
   {
-    videoId: "2N8_XDPW67Q",
-    title:
-      "Dil Beparvah (feat. Dhruv Bhola, Nikhil Vasudevan) (The Dewarists, Season 5)",
-    artist: "The Dewarists",
+    videoId: "bdS6OoH1W2A",
+    title: "Ajab Si",
+    artist: "Vishal - Shekhar",
   },
   {
-    videoId: "oZ7PnR_ZKRE",
-    title:
-      "Journey Song Full Audio | Piku | Amitabh Bachchan, Irrfan Khan & Deepika Padukone",
-    artist: "Piku",
+    videoId: "1q65CU2JoXg",
+    title: "Iktara",
+    artist: "Amit Trivedi",
   },
   {
-    videoId: "8HDTS80dlr4",
-    title:
-      "Patakha Guddi Highway Full Video Song (Official) || A.R Rahman | Alia Bhatt, Randeep Hooda",
-    artist: "Highway",
+    videoId: "LQzByGZHiQ8",
+    title: "Tum Jo Aaye",
+    artist: "Pritam",
   },
   {
-    videoId: "Gy3f_A8J7KQ",
-    title: "Mohit Chauhan - Babaji",
+    videoId: "o-9VdyXZKsQ",
+    title: "Tujhe Bhula Diya",
     artist: "Mohit Chauhan",
   },
   {
-    videoId: "QMtJqPw2m-8",
-    title: "Papon - Banao Banao",
-    artist: "Papon",
+    videoId: "FYHKeHYlVA4",
+    title: "Pee Loon",
+    artist: "Pritam",
   },
   {
-    videoId: "eEeX2QMlSlo",
+    videoId: "qH1eRWlJpsY",
+    title: "KABHI JO BAADAL BARSE",
+    artist: "Arijit Singh",
+  },
+  {
+    videoId: "5IX-nUxDtJI",
+    title: "Bin Tere",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "aG7MaqtWxT8",
+    title: 'Khuda Jaane (From "Bachna Ae Haseeno")',
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "AsieVqOTRs0",
+    title: "Mitwa",
+    artist: "Shankar Ehsaan Loy",
+  },
+  {
+    videoId: "gLBoyzFnAdE",
+    title: "Haule Haule",
+    artist: "Sukhwinder Singh",
+  },
+  {
+    videoId: "crrHSFnM3ic",
+    title: "LONDON THUMAKDA",
+    artist: "Labh Janjua",
+  },
+  {
+    videoId: "XAJSWVvgR2M",
+    title: "Abhi Toh Party Shuru Hui Hai",
+    artist: "Aastha Gill",
+  },
+  {
+    videoId: "pwKmLIPvEjI",
+    title: "Badtameez Dil",
+    artist: "Shefali Alvares",
+  },
+  {
+    videoId: "fbx6ULRrhXg",
+    title: "AMBARSARIYA",
+    artist: "Sona Mohapatra",
+  },
+  {
+    videoId: "lSPNH_rYKIg",
+    title: "Ilahi",
+    artist: "Amitabh Bhattacharya",
+  },
+  {
+    videoId: "ELZYwzTPUw4",
+    title: "TUMSE MILKE DIL KA",
+    artist: "Sonu Nigam",
+  },
+  {
+    videoId: "jitmi9o3As8",
+    title: "Tu Meri",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "ZCRL8V0ZkEA",
+    title: "Ishq Bulaava",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "vmzbVgLShEw",
+    title: "Ladki Badi Anjani Hai",
+    artist: "Jatin Lalit",
+  },
+  {
+    videoId: "-ePF1m7yw8U",
+    title: "Galat Baat Hai",
+    artist: "Neeti Mohan",
+  },
+  {
+    videoId: "d_QDYIJSkB8",
+    title: "Ye Ishq Hai",
+    artist: "Pritam",
+  },
+  {
+    videoId: "mUisIKGTkVw",
+    title: "Ishq Wala Love",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "r6yFwzExp0w",
+    title: "Bahara",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "TiP72S9tf7o",
+    title: "Teri Meri Kahaani",
+    artist: "Arijit Singh",
+  },
+  {
+    videoId: "t6t3i8SBbIM",
+    title: "Saathiyaa",
+    artist: "Shreya Ghoshal",
+  },
+  {
+    videoId: "xteZNX3B4yA",
+    title: "TUSE MILKE DIL KA HAI JO HAAL",
+    artist: "Sonu Nigam",
+  },
+  {
+    videoId: "d3nBjAuBmME",
+    title: "Balam Pichkari",
+    artist: "Release",
+  },
+  {
+    videoId: "ykWgSGsZyeo",
+    title: "RABBA",
+    artist: "Mohit Chauhan",
+  },
+  {
+    videoId: "PpiHfZbtQv8",
+    title: "I Hate Luv Storys",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "D2t8buu_7tU",
+    title: "SAADI GALLI AAJA",
+    artist: "Ayushmann Khurrana",
+  },
+  {
+    videoId: "eA7V16oogFA",
+    title: "Zaroorat",
+    artist: "Mustafa Zahid",
+  },
+  {
+    videoId: "jgcSK3P6U8Q",
+    title: "Kukkad",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "MoJVzTzixzs",
+    title: "SALAAM-E-ISHQ",
+    artist: "Sonu Nigam",
+  },
+  {
+    videoId: "V9Rib9c61Zg",
+    title: "Titli",
+    artist: "Chinmayi",
+  },
+  {
+    videoId: "JF7mC58X7_w",
+    title: "DIL NA DIYA",
+    artist: "Kunal Ganjawala",
+  },
+  {
+    videoId: "Eoj4kxD9Tnk",
+    title: "Locha-E-Ulfat",
+    artist: "Benny Dayal",
+  },
+  {
+    videoId: "VrIf8Rxssgc",
+    title: "RAAT BHAR",
+    artist: "Arijit Singh",
+  },
+  {
+    videoId: "AQ5qWopu_uU",
+    title: 'Sajdaa (From "My Name Is Khan")',
+    artist: "Shankar Ehsaan Loy",
+  },
+  {
+    videoId: "2g-p76-r33I",
+    title: "Zehnaseeb",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "HWpZ_rOe_f0",
+    title: "KAHIN TO",
+    artist: "Vasundhara Das",
+  },
+  {
+    videoId: "QSovkFvJW6k",
+    title: "Bhare Naina",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "VzxX4AQkzZA",
+    title: 'Tum Hi Ho Bandhu (From "Cocktail")',
+    artist: "Neeraj Shridhar",
+  },
+  {
+    videoId: "cB1jxbgf-Qs",
+    title: "Ik Junoon (Paint It Red)",
+    artist: "Vishal Dadlani",
+  },
+  {
+    videoId: "reBEkYrqMhA",
+    title: "Gerua",
+    artist: "Pritam",
+  },
+  {
+    videoId: "7Ayq6LPNISg",
+    title: "Drama Queen",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "r_hiM42nGZM",
+    title: "Bang Bang",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "gnrSX7TQJqU",
+    title: "Sooraj Ki Baahon Mein",
+    artist: "Release",
+  },
+  {
+    videoId: "SDboZSHp-VM",
+    title: "Give Me Some Sunshine",
+    artist: "Suraj Jagan",
+  },
+  {
+    videoId: "58jgsk7i3gQ",
+    title: "Ghagra",
+    artist: "Pritam",
+  },
+  {
+    videoId: "zQp8QINWUnc",
+    title: "Naina",
+    artist: "Sona Mohapatra",
+  },
+  {
+    videoId: "0780Oz21Qtc",
+    title: "Dil Hi Toh Hai",
+    artist: "Pritam",
+  },
+  {
+    videoId: "0780Oz21Qtc",
+    title: "Dil Hi Toh Hai",
+    artist: "Pritam",
+  },
+  {
+    videoId: "CL1d_4jgy-M",
+    title: "Kashmir Main Tu Kanyakumari",
+    artist: "Sunidhi Chauhan",
+  },
+  {
+    videoId: "Jzdzi0WXaxM",
+    title: "Dance Pe Chance",
+    artist: "Sunidhi Chauhan",
+  },
+  {
+    videoId: "yDWOp8ur90Q",
+    title: "Aas Paas Khuda",
+    artist: "Rahat Fateh Ali Khan",
+  },
+  {
+    videoId: "BnYokCSJDfw",
+    title: "ADHOORE",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "F7YIiGiCQmc",
+    title: "Jiya Re",
+    artist: "Neeti Mohan",
+  },
+  {
+    videoId: "-UU9J-LbfB8",
     title:
-      "Yun Hi Chala Chal Lyrical Video | Swades | A.R. Rahman | Javed Akhtar | Udit Narayan | Shahrukh Khan",
-    artist: "Swades",
+      'Samjhawan (Unplugged by Alia Bhatt) (From "Humpty Sharma Ki Dulhania")',
+    artist: "Jawad Ahmad",
   },
   {
-    videoId: "QkdYA_T-Mbs",
-    title: "Banjarey Full Audio Song | Fugly | Yo Yo Honey Singh",
-    artist: "Fugly",
+    videoId: "P_mNFy_dfn4",
+    title: "Deewangi Deewangi",
+    artist: "Vishal - Shekhar",
   },
   {
-    videoId: "9godkMYS1c4",
-    title: "Gaurav Pandey - Back Home To The Mountains | Official Music Video",
-    artist: "Gaurav Pandey",
+    videoId: "_P2g7D_1f0s",
+    title: "PEHLI BAAR",
+    artist: "Sukriti Kakar",
   },
   {
-    videoId: "4h5aIACGjQo",
-    title:
-      "Arijit Singh: Chota Sa Fasana Video Song | Karwaan | Irrfan Khan | DulQuer Salmaan | Mithila Palkar",
-    artist: "Karwaan",
+    videoId: "2svlPehTRu0",
+    title: "Kurbaan Hua",
+    artist: "Salim Merchant",
   },
   {
-    videoId: "R0XjwtP_iTY",
-    title:
-      "Khaabon Ke Parinday (Full video song) Zindagi Na Milegi Dobara | Hrithik Roshan, Kartina Kaif",
-    artist: "Zindagi Na Milegi Dobara",
+    videoId: "2svlPehTRu0",
+    title: "Kurbaan Hua",
+    artist: "Salim Merchant",
   },
   {
-    videoId: "Mo5tQDcs__g",
-    title:
-      "Full Video:Aao Milo Chalen|Jab We Met|Shahid Kapoor, Kareena Kapoor|Pritam, Shaan, Ustad Sultan Khan",
-    artist: "Jab We Met",
+    videoId: "1qz_5uzzo1s",
+    title: "Gun Gun Guna",
+    artist: "Ajay Gogavale",
   },
   {
-    videoId: "R3Ed4zvQ0Hs",
-    title:
-      "Saansein Lyrical Song | Karwaan | Irrfan Khan, Dulquer Salmaan, Mithila Palkar | Prateek Kuhad",
-    artist: "Karwaan",
+    videoId: "4-mSFnXqcyc",
+    title: "Mashallah",
+    artist: "Sajid-Wajid",
   },
   {
-    videoId: "XZhAJWI94hk",
-    title:
-      "Theher Ja | October | Varun Dhawan & Banita Sandhu | Armaan Malik | Abhishek Arora | Abhiruchi Chand",
-    artist: "October",
-  },
-  {
-    videoId: "dXpG0kavjUo",
-    title:
-      "Full Video: Yeh Ishq Hai | Jab We Met | Kareena Kapoor, Shahid Kapoor | Pritam | Shreya Ghoshal",
-    artist: "Jab We Met",
-  },
-  {
-    videoId: "epUBGOngvaU",
-    title: "Dooba Dooba - Dooba Dooba - Silk Route | Official Hindi Pop Song",
-    artist: "Silk Route",
-  },
-  {
-    videoId: "2Z0Put0teCM",
-    title:
-      "Lyrical : Senorita | Zindagi Na Milegi Dobara | Farhan Akhtar, Hrithik Roshan, Abhay Deol",
-    artist: "Zindagi Na Milegi Dobara",
-  },
-  {
-    videoId: "qLCLvzTGFVM",
-    title: "The Local Train - Dil Mere (Official)",
-    artist: "The Local Train",
-  },
-  {
-    videoId: "wqTQNs9sO6M",
-    title:
-      "Hairat Full Video | Anjaana Anjaani | Ranbir Kapoor, Priyanka Chopra | Lucky Ali | Vishal - Shekhar",
-    artist: "Anjaana Anjaani",
-  },
-  {
-    videoId: "KWA0_kI5PKk",
-    title:
-      "Aaj Kal Zindagi Full Video - Wake Up Sid|Ranbir Kapoor, Konkona Sen|Shankar Mahadevan",
-    artist: "Wake Up Sid",
-  },
-  {
-    videoId: "H0in5w8Zung",
-    title:
-      "Ghar se hum chale bas ek backpack | MTV Roadies season 5 theme song | Jeet lenge hum",
-    artist: "MTV Roadies",
-  },
-  {
-    videoId: "6EHpMmSyU5o",
-    title:
-      "Ik Junoon 'Paint It Red'- Full Song feat.Hrithik -Zindagi Na Milegi Dobara (in True HD )",
-    artist: "Zindagi Na Milegi Dobara",
-  },
-  {
-    videoId: "NlEqiKJjh-k",
-    title:
-      "Queen: O Gujariya Full Video Song | Kangana Ranaut, Lisa Haydon, Raj Kumar Rao",
-    artist: "Queen",
-  },
-  {
-    videoId: "hJBHSmyqv0Y",
-    title:
-      "Humraah Full Song | Malang | Aditya R K, Disha P Anil K Kunal K | Sachet T | Mohit S | Fusion P",
-    artist: "Malang",
-  },
-  {
-    videoId: "uqa0BvYy03I",
-    title: "SANAM - Neele Neele Ambar Par",
-    artist: "Sanam",
-  },
-  {
-    videoId: "geBOXRbvSu4",
-    title:
-      "Musafir Hoon Yaron | Rishabh Tiwari | Ft. Sapna Rathore & Prashant Sethi | Tarun Sharma",
-    artist: "Rishabh Tiwari",
-  },
-  {
-    videoId: "JlgkMXex2DI",
-    title: "SANAM - Hai Apna Dil To Awara - Ft. Soogum Sookha",
-    artist: "Sanam",
-  },
-  {
-    videoId: "61cnlW6hLzg",
-    title:
-      "Ek Pyar Ka Nagma Hai | Lyrical | Carvaan Lounge | Neeti Mohan | Papon | Arko | Anupriya Goenka",
-    artist: "Carvaan Lounge",
-  },
-  {
-    videoId: "3Ge_VoC1Cf8",
-    title:
-      "Yeh Raat Bheegi Bheegi | Sanam ft. Aishwarya Majmudar | Official HD Video | Raj Kapoor | Nargis Dutt",
-    artist: "Sanam",
-  },
-  {
-    videoId: "XpD73w-tvSY",
-    title:
-      "Lag Ja Gale / Abhi Na Jao Chhod Ke - Akriti Kakar | Big Band Theory | Mashup",
-    artist: "Akriti Kakar",
-  },
-  {
-    videoId: "VOFm2oB8t98",
-    title: "Sham",
-    artist: "Prateek Kuhad",
-  },
-  {
-    videoId: "4HRC6c5-2lQ",
-    title: "SANAM - Yeh Raaten Yeh Mausam - Ft. Simran Sehgal",
-    artist: "Sanam",
-  },
-  {
-    videoId: "iFwRoxuN_9o",
-    title: "SANAM - Dilbar Mere",
-    artist: "Sanam",
-  },
-  {
-    videoId: "c2gSzYLJ8sY",
-    title:
-      "Ishq Bulaava Full Video - Hasee Toh Phasee|Parineeti, Sidharth|Sanam Puri, Shipra Goyal",
-    artist: "Hasee Toh Phasee",
-  },
-  {
-    videoId: "IbBT5VZ3Lpg",
-    title:
-      "Old Songs Mashup | 20 Songs On ONE CHORD | Siddharth Slathia | Pehchan Music",
-    artist: "Siddharth Slathia",
-  },
-  {
-    videoId: "HqUeSjsYLNU",
-    title:
-      "Makhna - Drive | Sushant Singh Rajput, Jacqueline Fernandez | Tanishk Bagchi, Asees Kaur",
-    artist: "Drive",
-  },
-  {
-    videoId: "bR8sE9ubyTI",
-    title: 'MEMBA - For Aisha (Featured in "The Sky Is Pink") [Lyric Video]',
-    artist: "MEMBA",
-  },
-  {
-    videoId: "9LjKAt6SkdQ",
-    title: "The Local Train - Khudi (Official)",
-    artist: "The Local Train",
-  },
-  {
-    videoId: "vt4jX0iRgCg",
-    title:
-      "Kho Gaye Hum Kahan -Full Video |Baar Baar Dekho | Sidharth Malhotra, Katrina K| Jasleen R, Prateek K",
-    artist: "Baar Baar Dekho",
-  },
-  {
-    videoId: "nLdIt92oM5c",
-    title: "Tu Kisi Rail Si",
-    artist: "Masaan",
-  },
-  {
-    videoId: "Il7Nv270zNk",
-    title: "Prateek Kuhad - cold/mess",
-    artist: "Prateek Kuhad",
-  },
-  {
-    videoId: "6BYIKEH0RCQ",
-    title: "Ritviz - Liggi [Official Music Video]",
-    artist: "Ritviz",
-  },
-  {
-    videoId: "KBIq11mNB0I",
-    title:
-      "Full Video: Malang (Title Track)| Aditya Roy Kapur, Disha Patani, Anil K, Kunal K | Ved S | Mohit S",
-    artist: "Malang",
-  },
-  {
-    videoId: "0gosur3db5I",
-    title:
-      "AIB : Udd Gaye by RITVIZ [Official Music Video] | #BacardiHousePartySessions",
-    artist: "Ritviz",
-  },
-  {
-    videoId: "azFITRcZ9Os",
-    title: "Purani Jeans Aur Guitar | Acoustic Version | Sachet Tandon |",
-    artist: "Sachet Tandon",
-  },
-  {
-    videoId: "2kj0oZP0YoI",
-    title:
-      "Mileya Mileya Official Full Song Video PRIYA ANDREWS | REKHA BHARDWAJ | JIGAR SARAIYA",
-    artist: "Rekha Bhardwaj",
-  },
-  {
-    videoId: "ZmcBC9-wAXM",
-    title:
-      "Qaafirana | Kedarnath | Sushant Rajput | Sara Ali Khan | Arijit Singh & Nikhita | Amit Trivedi",
-    artist: "Kedarnath",
-  },
-  {
-    videoId: "8FMz_KT1mC4",
-    title:
-      "Jo Bheji Thi Duaa Shanghai Full Song | Emraan hashmi, Abhay Deol, Kalki Koechlin",
-    artist: "Shanghai",
-  },
-  {
-    videoId: "3PmtRjTBcXk",
-    title:
-      "Kya Hua Tera Wada - Unplugged | Pranav Chandran | Trending Songs | Pehchan Music | Old Hindi Songs",
-    artist: "Pranav Chandran",
-  },
-  {
-    videoId: "uKspitQJycA",
-    title:
-      "Raat Kali / Emptiness Mashup | Digvijay Singh | Kishore Kumar | Cover",
-    artist: "Digvijay Singh",
-  },
-  {
-    videoId: "fhKVp1-kJDs",
-    title: "Tum Itna Jo - Papon | MTV Unplugged",
-    artist: "Papon",
-  },
-  {
-    videoId: "kums97Zw3z8",
-    title:
-      "Meri Bheegi Bheegi Si Song  Kishore Kumar  Anamika 1973 Hindi Movie  YouTube",
-    artist: "Kishore Kumar",
-  },
-  {
-    videoId: "8367ETnagHo",
-    title: "Coke Studio Season 9| Tera Woh Pyar| Momina Mustehsan & Asim Azhar",
-    artist: "Coke Studio",
-  },
-  {
-    videoId: "nD1jhw6F-J4",
-    title:
-      "Voh Dekhnay Mein Full Video - London Paris New York|Ali Zafar, Aditi Rao Hydari",
-    artist: "London Paris New York",
-  },
-  {
-    videoId: "L-9s4nTLSdA",
-    title:
-      "Madari - Clinton Cerejo feat Vishal Dadlani & Sonu Kakkar, Coke Studio @ MTV Season 2",
-    artist: "Coke Studio",
-  },
-  {
-    videoId: "T94PHkuydcw",
-    title:
-      "ROCKSTAR: Kun Faya Kun (Full Video Song) | Ranbir Kapoor | A.R. Rahman, Javed Ali, Mohit Chauhan",
-    artist: "Rockstar",
-  },
-  {
-    videoId: "SS3lIQdKP-A",
-    title:
-      "Full Video: Masakali | Delhi 6 | Abhishek Bachchan, Sonam Kapoor | A.R. Rahman |  Mohit Chauhan",
-    artist: "Delhi 6",
-  },
-  {
-    videoId: "uxTXp0-iZrY",
-    title:
-      "Pashmina | Fitoor | Aditya Roy Kapur, Katrina Kaif | Amit Trivedi | love song",
-    artist: "Fitoor",
-  },
-  {
-    videoId: "x_NoA_Fp2Rc",
-    title:
-      "Jugni - Full Video Song | Cocktail | Saif Ai Khan, Deepika Padukone & Diana Penty | Pritam",
-    artist: "Cocktail",
-  },
-  {
-    videoId: "qTsAdjULqwg",
-    title:
-      "Uff Teri Adaa Full Video Song | Karthik Calling Karthik | Farhan Akhtar, Deepika Padukone",
-    artist: "Karthik Calling Karthik",
-  },
-  {
-    videoId: "VkJlv0m6els",
-    title:
-      "'Pehli Baar' VIDEO Song | Dil Dhadakne Do | Ranveer Singh, Anushka Sharma | T-Series",
-    artist: "Dil Dhadakne Do",
-  },
-  {
-    videoId: "YR12Z8f1Dh8",
-    title:
-      "3 - Why This Kolaveri Di Official Video | Dhanush | Anirudh Ravichander | Shruti Haasan",
-    artist: "Dhanush",
-  },
-  {
-    videoId: "oSpMspvMkSQ",
-    title:
-      "Kudi Nu Nachne De:Angrezi Medium|Anushka,Katrina,Alia,Janhvi,Ananya,Kriti,Kiara,Radhika,Sachin-Jigar",
-    artist: "Angrezi Medium",
-  },
-  {
-    videoId: "Ynimc6hMoBA",
-    title:
-      "Daru Desi (Full Video Song) | Cocktail | BollyWoo.ooo | Saif Ali Khan, Deepika Padukone, Diana Penty",
-    artist: "Cocktail",
-  },
-  {
-    videoId: "6vKucgAeF_Q",
-    title:
-      "MATARGASHTI full VIDEO Song | TAMASHA Songs 2015 | Ranbir Kapoor, Deepika Padukone | T-Series",
-    artist: "Tamasha",
-  },
-  {
-    videoId: "1GWyCJHuNms",
-    title:
-      "Challa | Full Song | Jab Tak Hai Jaan | Shah Rukh Khan, Katrina Kaif | Rabbi | A. R. Rahman | Gulzar",
-    artist: "Jab Tak Hai Jaan",
-  },
-  {
-    videoId: "0KNk-Joi-NM",
-    title:
-      "Tera Ghata | Gajendra Verma Ft. Karishma Sharma | Vikram Singh | Official Video",
-    artist: "Gajendra Verma",
-  },
-  {
-    videoId: "-Lw8k4hYGVk",
-    title:
-      "Dil Hi Toh Hai - The Sky Is Pink | Priyanka Chopra Jonas,Farhan Akhtar |Arijit Singh, Pritam, Gulzar",
-    artist: "The Sky Is Pink",
-  },
-  {
-    videoId: "6SncLwWFrJ0",
-    title:
-      "Pichle saat Dinon Mein Full Song | Rock On!! - OST | Arjun Rampal,Farhan Akhtar,Luke Kenny",
-    artist: "Rock On!!",
-  },
-  {
-    videoId: "HIbzXaBdwZw",
-    title:
-      "Full Video: Kabhi Kabhi Aditi Zindagi | Jaane Tu Ya Jaane Na | A.R. Rahman | Rashid Ali",
-    artist: "Jaane Tu Ya Jaane Na",
-  },
-  {
-    videoId: "BrfRB6aTZlM",
-    title:
-      "A.R. Rahman - Roobaroo - Audio | Rang De Basanti | Aamir Khan | A. R. Rahman | Naresh Iyer",
-    artist: "Rang De Basanti",
-  },
-  {
-    videoId: "uB5bf7LQPVU",
-    title: "The Local Train: Choo Lo (Home Demo)",
-    artist: "The Local Train",
-  },
-  {
-    videoId: "i96UO8-GFvw",
-    title: "The Local Train - Aaoge Tum Kabhi (Official)",
-    artist: "The Local Train",
-  },
-  {
-    videoId: "eY62RfeviuE",
-    title:
-      "Sinbad The Sailor | Rock On | Farhan Akhtar, Raman Mahadevan | Shankar-Ehsaan-Loy",
-    artist: "Rock On",
-  },
-  {
-    videoId: "c6riJnK_AVs",
-    title: "Rasta Jahaan Le Chale",
-    artist: "Bombay Velvet",
-  },
-  {
-    videoId: "sV_sz8TF7kg",
-    title:
-      "Shimla Tha Ghar | Deepak Rathore Project | Latest Hindi Songs 2016 | Speed Records",
-    artist: "Deepak Rathore Project",
-  },
-  {
-    videoId: "MDwVsoIen3k",
-    title:
-      "Dariya - Lyrical Video | Baar Baar Dekho | Sidharth Malhotra & Katrina Kaif | Arko",
-    artist: "Baar Baar Dekho",
-  },
-  {
-    videoId: "yUu26tcUri0",
-    title:
-      "Gajendra Verma - Tune Mere Jaana Kabhi Nahi Jaana I Emptiness | Gajendra Verma Songs | Sonotek Music",
-    artist: "Gajendra Verma",
-  },
-  {
-    videoId: "__qkzfWhi6g",
-    title: "Shaan - Tanha Dil",
+    videoId: "3qzos9Xgvng",
+    title: "Behti Hawa Sa Tha Woh",
     artist: "Shaan",
   },
   {
-    videoId: "V0FotIwYhMw",
-    title: '"Hawa Hawai" Shaitan Movie Full Video Song | Kalki Koechlin',
-    artist: "Shaitan",
+    videoId: "W_076ZN_n7A",
+    title: 'Radha (From "Student of the Year")',
+    artist: "Vishal - Shekhar",
   },
   {
-    videoId: "Zqv5CBWt9yA",
-    title: "Bhuvan Bam- Safar | Official Music Video |",
-    artist: "Bhuvan Bam",
+    videoId: "BYVj_e0faU0",
+    title: "PAPPU CAN'T DANCE",
+    artist: "Satish Chakravarthy",
   },
   {
-    videoId: "jcV7i0WM9jU",
-    title:
-      "Lo Safar Song With Lyrics | Baaghi 2 | Tiger Shroff | Disha Patani | Jubin Nautiyal",
-    artist: "Baaghi 2",
+    videoId: "qY66m8UosfQ",
+    title: "Shanivaar Raati",
+    artist: "Arijit Singh",
   },
   {
-    videoId: "ttIKsnxPrMY",
-    title:
-      "ROCKSTAR: Nadaan Parinde (Full Song) | Ranbir Kapoor | A. R. Rahman | Mohit Chauhan | Irshaad Kamil",
-    artist: "Rockstar",
+    videoId: "G9SOAHXDk64",
+    title: "One Two Three Four (Get On The Dance Floor)",
+    artist: "Vishal Dadlani",
   },
   {
-    videoId: "x42dH5K_Lj0",
-    title:
-      "Notebook: Safar Video | Zaheer Iqbal & Pranutan Bahl | Mohit Chauhan | Vishal Mishra",
-    artist: "Notebook",
+    videoId: "S6DhdT0NAzI",
+    title: "The Jawaani Song",
+    artist: "Vishal - Shekhar",
   },
   {
-    videoId: "aZngT1Eas4w",
-    title:
-      "Hai Junoon Song | New York | John Abraham, Katrina Kaif, Neil Nitin Mukesh | KK | Pritam | है जुनून",
-    artist: "New York",
+    videoId: "WxXbLnBq0n0",
+    title: "Aashiyan",
+    artist: "Pritam",
   },
   {
-    videoId: "hnswwRWLi3E",
-    title:
-      "A.R. Rahman - Khalbali Best Video|Rang De Basanti|Aamir Khan|Siddharth|Soha|Nacim",
-    artist: "Rang De Basanti",
+    videoId: "t9o22bt6VU0",
+    title: "Palat - Tera Hero Idhar Hai",
+    artist: "Arijit Singh",
   },
   {
-    videoId: "Z_-lSJg52NU",
-    title:
-      "Namo Namo - Full Audio | Kedarnath | Sushant Rajput | Sara Ali Khan | Amit Trivedi | Amitabh B",
-    artist: "Kedarnath",
+    videoId: "UFzBtouqWVA",
+    title: "Uff",
+    artist: "Vishal - Shekhar",
   },
   {
-    videoId: "hsTQKwZEMQE",
-    title:
-      "Chor Bazari | Full Audio Song | Love Aaj Kal | Saif Ali Khan & Deepika Padukone",
-    artist: "Love Aaj Kal",
+    videoId: "sxB4bCU0F60",
+    title: "Zoobi Doobi",
+    artist: "Sonu Nigam",
   },
   {
-    videoId: "tFDDcUi7hrI",
-    title:
-      "Tu Chale Toh - Full Video | Qarib Qarib Singlle | Irrfan | Parvathy | Papon | Rochak Kohli",
-    artist: "Qarib Qarib Singlle",
+    videoId: "Qr0DCdRNQxI",
+    title: "KOI TUMSA NAHIN",
+    artist: "Sonu Nigam",
+  },
+  {
+    videoId: "7KSgzG9kbw4",
+    title: "Iski Uski",
+    artist: "Akriti Kakar",
+  },
+  {
+    videoId: "WP8KWkt4SbI",
+    title: 'Bheegi Si Bhaagi Si (From "Raajneeti")',
+    artist: "Pritam",
+  },
+  {
+    videoId: "sKBKIY5p0Ds",
+    title: "Tera Rastaa Chhodoon Na",
+    artist: "Amitabh Bhattacharya",
+  },
+  {
+    videoId: "I3tgyXQC38c",
+    title: "Lucky Tu Lucky Me",
+    artist: "Sachin-Jigar",
+  },
+  {
+    videoId: "tYULFA8ijyo",
+    title: "TERE BINAA",
+    artist: "Mustafa Zahid",
+  },
+  {
+    videoId: "c6cHxi2eLQ4",
+    title: "Maa",
+    artist: "Shankar Mahadevan",
+  },
+  {
+    videoId: "Zhb5_y2KNEw",
+    title: "Bezubaan Phir Se",
+    artist: "Vishal Dadlani",
+  },
+  {
+    videoId: "Qe18x3hETA0",
+    title: "Meherbaan",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "QJpUAlbQk9Y",
+    title: "Pal Pal Har Pal",
+    artist: "Sonu Nigam",
+  },
+  {
+    videoId: "MVwf8EmGv8A",
+    title: 'Pani Da Rang Male (From "Vicky Donor")',
+    artist: "Ayushmann Khurrana",
+  },
+  {
+    videoId: "NmlURA07qGM",
+    title: "Offo",
+    artist: "Aditi Singh Sharma",
+  },
+  {
+    videoId: "NRAvWDSxfl0",
+    title: 'Senorita (From "Zindagi Na Milegi Dobara")',
+    artist: "Farhan Akhtar",
+  },
+  {
+    videoId: "4jKa2hewAkg",
+    title: "Nagada Sang Dhol",
+    artist: "Shreya Ghoshal",
+  },
+  {
+    videoId: "YUfLJ68Jwyg",
+    title: "Preet",
+    artist: "Jasleen Royal",
+  },
+  {
+    videoId: "xP8Ww4jkQoI",
+    title: "Chammak Challo (International Version)",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "oYG2CScW5F4",
+    title: "Tumse Hi Tumse",
+    artist: "Shekhar Ravjiani",
+  },
+  {
+    videoId: "ZOfOS2VykRc",
+    title: "Anjaana Anjaani",
+    artist: "Vishal Dadlani",
+  },
+  {
+    videoId: "SwR0eJ92UR8",
+    title: "Jab Se Tere Naina",
+    artist: "Shani Kumar Saniya",
+  },
+  {
+    videoId: "TIw-udUM8BU",
+    title: "DIL DHADAKNE DO",
+    artist: "Priyanka Chopra",
+  },
+  {
+    videoId: "L0iuPXg0mCw",
+    title: "Ratta Maar",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "g3icG9Zywew",
+    title: "Pyaar Ki Yeh Kahani",
+    artist: "Vishal - Shekhar",
+  },
+  {
+    videoId: "vbW_zqQVZE0",
+    title: 'Shukran Allah (From "Kurbaan")',
+    artist: "Salim Merchant",
+  },
+  {
+    videoId: "AbihV7qJXus",
+    title: "Saans (Reprise)",
+    artist: "Shreya Ghoshal",
+  },
+  {
+    videoId: "L-DbeI3YCIA",
+    title: "Tere Naina",
+    artist: "Shankar Ehsaan Loy",
+  },
+  {
+    videoId: "fWsq4-FvQ-M",
+    title: 'Daaru Desi (From "Cocktail")',
+    artist: "Benny Dayal",
+  },
+  {
+    videoId: "JoSR1dSI2ds",
+    title: "Blame The Night",
+    artist: "Various Artists",
+  },
+  {
+    videoId: "eJuWIKRtNns",
+    title: "Galliyan",
+    artist: "Ankit Tiwari",
+  },
+  {
+    videoId: "yowTz2PFDV8",
+    title: "Ek Main Aur Ekk Tu",
+    artist: "Benny Dayal",
+  },
+  {
+    videoId: "t2CHtFE8pMo",
+    title: "Lahu Munh Lag Gaya",
+    artist: "Shail Hada",
+  },
+  {
+    videoId: "ZN7DcixuLw4",
+    title: "Saiyaara Rebirth",
+    artist: "Sohail Sen",
+  },
+  {
+    videoId: "D94WSTI_UC0",
+    title: "Allah Waariyan",
+    artist: "Shafqat Amanat Ali",
+  },
+  {
+    videoId: "37JjGXBPIOM",
+    title: "Subhanallah",
+    artist: "Pritam",
+  },
+  {
+    videoId: "ONlxQMFmR4w",
+    title: "Koi Mil Gaya.",
+    artist: "Shurjo Bhattacharya",
+  },
+  {
+    videoId: "97FJsWl_OGo",
+    title: "Om Shanti Om",
+    artist: "Meditative Mind",
+  },
+  {
+    videoId: "chRtu8DrGs8",
+    title: "Pareshaan (Remix)",
+    artist: "Shalmali Kholgade",
+  },
+  {
+    videoId: "FrdRpJoRRT4",
+    title: "Tattad Tattad",
+    artist: "Aditya Narayan",
+  },
+  {
+    videoId: "S9uSPpNZ8DA",
+    title: "Laapata Rebirth",
+    artist: "Sohail Sen",
+  },
+  {
+    videoId: "r8xqL2gbmvQ",
+    title: "Besharmi Ki Height",
+    artist: "Benny Dayal",
+  },
+  {
+    videoId: "tny8p29M7J0",
+    title: "Ash King - Aunty JI (Live)",
+    artist: "T & A Photography & Media",
+  },
+  {
+    videoId: "MZkrcUzJANQ",
+    title: "Kabira",
+    artist: "Pritam",
+  },
+  {
+    videoId: "BLXISeAXD04",
+    title: "Subha Hone Na De",
+    artist: "Pritam",
+  },
+  {
+    videoId: "BoJlxXq_2NI",
+    title: "Vishal-Shekhar.......Tara Rum Pum",
+    artist: "nehasareen",
+  },
+  {
+    videoId: "O1tz7vhtul8",
+    title: "Raabta",
+    artist: "Pritam",
+  },
+  {
+    videoId: "cyFydLrAeiU",
+    title: "I Love You",
+    artist: "Pritam",
+  },
+  {
+    videoId: "RsokTAWqsc0",
+    title: "Shafqat Amanat Ali - Dildaara (Stand By Me) [Full HD]",
+    artist: "Radiozamana",
+  },
+  {
+    videoId: "afJZDEvMCZE",
+    title: "Dilli Wali Girlfriend",
+    artist: "Norbu Tshering",
+  },
+  {
+    videoId: "nOSUza1b424",
+    title: "Tu Jo Mila",
+    artist: "Pritam",
+  },
+  {
+    videoId: "3i-hpM7x2f4",
+    title: "Salim suleiman concert daman - Aadat se majboor",
+    artist: "Chintak Shah",
+  },
+  {
+    videoId: "egSGtA7ixt8",
+    title: "Main Rang Sharbaton Ka / Sunday Morning",
+    artist: "Penn Masala",
+  },
+  {
+    videoId: "aZkT2qQgoCs",
+    title: "Sharib-Toshi | Saturday Saturday | Live Performance",
+    artist: "BlueNote Entertainment",
+  },
+  {
+    videoId: "qzDTpyd6IMI",
+    title: "Banjaara Hd sohail; songs",
+    artist: "Sohail Khan",
+  },
+  {
+    videoId: "3CCbZwgaQss",
+    title: "Pritam abcd m",
+    artist: "Hira bhai Hira bhai",
+  },
+  {
+    videoId: "E6gDUyD8tnU",
+    title: "Kabra Nu Challa",
+    artist: "Yad sharma",
+  },
+  {
+    videoId: "lJjlONBpxS4",
+    title: "Chand Sifarish",
+    artist: "L3AD",
   },
 ].map((track) => ({
   title: track.title.split("|")[0].trim(),
   artist: track.artist,
   src: `https://www.youtube.com/watch?v=${track.videoId}`,
-  // Automatically generate the YouTube thumbnail URL:
   thumbnail: `https://img.youtube.com/vi/${track.videoId}/hqdefault.jpg`,
 }));
-
 export default function Page() {
-  useEffect(() => {
-    const handleRejection = (event: PromiseRejectionEvent) => {
-      if (
-        event.reason &&
-        typeof event.reason.message === "string" &&
-        event.reason.message.includes(
-          "The play() request was interrupted by a call to pause()",
-        )
-      ) {
-        event.preventDefault(); // Silences the YouTube iframe AbortError warning entirely
-      }
-    };
-
-    window.addEventListener("unhandledrejection", handleRejection);
-    return () =>
-      window.removeEventListener("unhandledrejection", handleRejection);
-  }, []);
-
-  // Whether the visitor has "boarded" — this first tap is what lets the
-  // hidden YouTube player actually start audio. Browsers block autoplay
-  // with sound until there's been a real user gesture, so instead of
-  // fighting that, we make the gesture part of the theme.
   const [boarded, setBoarded] = useState(false);
-
   const [playing, setPlaying] = useState(false);
-  const [played, setPlayed] = useState(0); // This tracks the progress (0 to 1)
   const [stationIndex, setStationIndex] = useState(0);
-  const [volume, setVolume] = useState(68);
-  const [ambientOpen, setAmbientOpen] = useState(false);
-  const [aboutOpen, setAboutOpen] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [chai, setChai] = useState(0);
   const [notice, setNotice] = useState("");
-  const [isNight, setIsNight] = useState(true);
   const [isBuffering, setIsBuffering] = useState(false);
-
-  // Animation states
-  const [floatingChais, setFloatingChais] = useState<
-    { id: number; x: number }[]
-  >([]);
-  const [reduceMotion, setReduceMotion] = useState(false);
 
   const audioContext = useRef<AudioContext | null>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -621,57 +715,41 @@ export default function Page() {
 
   const currentStation = stations[stationIndex];
 
-  // Mobile-friendly clock
-  const [currentTime, setCurrentTime] = useState("");
+  // Supress React Player AbortError noise
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTime(
-        now.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        }),
-      );
+    const handleRejection = (event: PromiseRejectionEvent) => {
+      if (
+        event.reason &&
+        typeof event.reason.message === "string" &&
+        event.reason.message.includes("The play() request was interrupted")
+      ) {
+        event.preventDefault();
+      }
     };
-    updateTime();
-    const timer = setInterval(updateTime, 60000);
-    return () => clearInterval(timer);
+    window.addEventListener("unhandledrejection", handleRejection);
+    return () =>
+      window.removeEventListener("unhandledrejection", handleRejection);
   }, []);
 
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(query.matches);
-    const onChange = () => setReduceMotion(query.matches);
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
-
+  // Keyboard Shortcuts
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLInputElement) return;
       if (!boarded) return;
       if (event.code === "Space") {
         event.preventDefault();
         togglePlay();
       }
-      if (event.key.toLowerCase() === "m") setMuted((value) => !value);
-      if (event.key.toLowerCase() === "a") setAmbientOpen((value) => !value);
       if (event.key === "ArrowRight") changeStation(1);
       if (event.key === "ArrowLeft") changeStation(-1);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boarded, playing, stationIndex]);
 
   function clickSound() {
     try {
       const AudioCtor =
-        window.AudioContext ||
-        (window as typeof window & { webkitAudioContext?: typeof AudioContext })
-          .webkitAudioContext;
+        window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtor) return;
       const context = audioContext.current ?? new AudioCtor();
       audioContext.current = context;
@@ -708,139 +786,52 @@ export default function Page() {
     setPlaying((value) => !value);
   }
 
-  function handleChaiClick() {
-    clickSound();
-    setChai((value) => value + 1);
-    tell("Chai is on the way.");
-
-    // Floating chai animation
-    const id = Date.now();
-    const randomX = Math.random() * 40 - 20;
-    setFloatingChais((prev) => [...prev, { id, x: randomX }]);
-
-    setTimeout(() => {
-      setFloatingChais((prev) => prev.filter((item) => item.id !== id));
-    }, 2000);
-  }
-
   function changeStation(direction: number) {
     clickSound();
-    setPlaying(false); // 1. Briefly pause
-
+    setPlaying(false);
     setTimeout(() => {
-      setStationIndex(
-        (index) => (index + direction + stations.length) % stations.length,
-      );
-      setPlaying(true); // 2. Resume playing after the state update
-      tell(
-        `Tuned to: ${stations[(stationIndex + direction + stations.length) % stations.length].title}`,
-      );
-    }, 100); // Small 100ms delay gives the DOM time to acknowledge the change
+      const nextIndex =
+        (stationIndex + direction + stations.length) % stations.length;
+      setStationIndex(nextIndex);
+      setPlaying(true);
+      tell(`Tuned to: ${stations[nextIndex].title}`);
+    }, 100);
   }
-
-  function selectStation(index: number) {
-    if (!boarded || index === stationIndex) return;
-    clickSound();
-    setStationIndex(index);
-    setPlaying(true);
-    tell(`Tuned to: ${stations[index].title}`);
-  }
-
-  useEffect(() => {
-    const originalConsoleError = console.error;
-    console.error = (...args) => {
-      if (typeof args[0] === "string" && args[0].includes("widgetapi")) {
-        return; // Ignore the YouTube noise
-      }
-      originalConsoleError(...args);
-    };
-    return () => {
-      console.error = originalConsoleError;
-    };
-  }, []);
 
   return (
-    <main
-      className={`sleeper-app relative w-full h-[100dvh] overflow-hidden ${isNight ? "night-mode" : ""}`}
-    >
-      <div
-        className="grain absolute inset-0 pointer-events-none z-10"
-        aria-hidden="true"
-      />
+    <main className="h-[100dvh] w-screen overflow-hidden relative selection:bg-[#dc2626] selection:text-white bg-[#0a0a0a] text-[#ededed] font-sans">
+      {/* Background Component */}
+      <div className="absolute inset-0 z-0 bg-black">
+        {/* Desktop Background (Hidden on mobile, visible on medium+ screens) */}
+        <Image
+          src={bgImage}
+          alt="South Asian street station scene at night"
+          fill
+          priority
+          className="object-cover object-center opacity-80 hidden md:block"
+        />
 
-      {/* HEADER */}
-      <header className="topbar absolute top-0 w-full z-50 flex flex-wrap items-center justify-between gap-2 px-3 sm:px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:py-4 bg-gradient-to-b from-black/80 sm:from-black/60 to-transparent text-white">
-        <div className="station-time text-xs sm:text-sm font-medium tracking-widest uppercase whitespace-nowrap bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-          {currentTime || "8:54 PM"}
-        </div>
+        {/* Mobile Background (Visible on mobile, hidden on medium+ screens) */}
+        <Image
+          src={mobileBgImage}
+          alt="South Asian street station scene at night (Vertical)"
+          fill
+          priority
+          className="object-cover object-center opacity-80 block md:hidden"
+        />
 
-        <div className="top-actions flex items-center justify-end gap-1 sm:gap-2">
-          <a
-            className="platform-link spotify-link items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-300 active:scale-95 hidden sm:flex"
-            href="https://open.spotify.com/playlist/0rXkrKD5eOVn4sVdOqceCx?si=p9ifxdQcSk6r-qoiv_sbxQ&utm_source=native-share-menu&pi=ojwT_U2GQFOhL&nd=1&dlsi=2826cc5ff16a46e9"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Spotify"
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.54.659.3 1.021zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15.001 10.62 18.72 12.9c.36.181.54.78.241 1.14zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-            </svg>
-          </a>
-          <a
-            className="platform-link youtube-link items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-300 active:scale-95 hidden sm:flex"
-            href="https://music.youtube.com"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="YouTube Music"
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 19.16c-3.954 0-7.16-3.206-7.16-7.16 0-3.954 3.206-7.16 7.16-7.16 3.954 0 7.16 3.206 7.16 7.16 0 3.954-3.206 7.16-7.16 7.16zM9.545 7.979v8.042l7.636-4.021-7.636-4.02z" />
-            </svg>
-          </a>
+        {/* Gradient Overlay for player legibility */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/20 via-black/40 to-black/95"></div>
+      </div>
 
-          <button
-            className="top-icon flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-300 active:scale-95"
-            aria-label="Open about and FAQ"
-            onClick={() => {
-              clickSound();
-              setAboutOpen(true);
-              setAmbientOpen(false);
-            }}
-          >
-            <Info size={20} />
-          </button>
-        </div>
-      </header>
-
-      {/* HIDDEN YOUTUBE PLAYER (saloon.wtf trick — zero-size iframe, audio only) */}
-      {/*
-          react-player v3 renamed a few things from v2, which is why audio
-          wasn't playing before:
-            - the prop is `src`, not `url`
-            - there's no `onBuffer`/`onBufferEnd` anymore — the real events
-              are the native media ones, `onWaiting` and `onPlaying`
-            - `config` is intentionally left out below: an inline object
-              literal gets a new reference on every render, and passing a
-              fresh object into the player on every re-render is what was
-              causing the "play() request was interrupted by pause()"
-              warning as the player kept re-settling. `playsInline` is a
-              first-class prop now, so we don't need config for that.
-        */}
-      {/* 
-   By using the station index as a 'key', Next.js will completely 
-   destroy the old player and create a new one every time you switch stations, 
-   which prevents the widgetapi from getting confused. 
-*/}
-      {/* HIDDEN YOUTUBE PLAYERS */}
+      {/* Hidden YouTube Player */}
       <div className="hidden">
-        {/* Main Music Player */}
         <ReactPlayer
           key={stationIndex}
           ref={playerRef}
           src={currentStation.src}
           playing={playing && boarded}
-          volume={muted ? 0 : volume / 100}
-          muted={muted}
+          volume={1} // Defaulting to full volume
           playsInline
           width="0"
           height="0"
@@ -848,340 +839,208 @@ export default function Page() {
           onWaiting={() => setIsBuffering(true)}
           onPlaying={() => setIsBuffering(false)}
           onEnded={() => changeStation(1)}
-          onError={(e: any) => console.warn("Music Player error:", e)}
         />
       </div>
 
-      {/* BACKGROUND SCENE — the title lives inside bg.png already, so no text is layered on top here */}
-      <section
-        className="window-scene w-full h-full relative z-0 overflow-hidden"
-        aria-label="A moving view from an Indian Railways sleeper coach"
-      >
-        <div
-          className={`scene-motion absolute -inset-2 -z-10 ${reduceMotion ? "" : "animate-train-drift"}`}
-        >
-          {/* Desktop background */}
-          <Image
-            src={bgImage}
-            alt="Sleeper Class Background"
-            fill
-            priority
-            className="object-cover object-center hidden sm:block"
-          />
-          {/* Mobile background */}
-          <Image
-            src={mobileBgImage}
-            alt="Sleeper Class Background (Mobile)"
-            fill
-            priority
-            className="object-cover object-center sm:hidden"
-          />
-        </div>
-        <div className="absolute inset-0 bg-black/10 -z-10" />
+      {/* UI Overlay */}
+      <div className="relative z-10 w-full h-full flex flex-col justify-between px-[24px] py-[24px]">
+        {/* Top Navigation Bar */}
+        <header className="flex items-center justify-between w-full pt-[max(1rem,env(safe-area-inset-top))]">
+          {/* Status Badge: Online */}
+          <div className="flex items-center gap-[6px] bg-transparent border border-white/20 rounded-[9999px] px-[14px] py-[8px] pl-[12px] backdrop-blur-md">
+            <div className="w-2.5 h-2.5 rounded-[9999px] bg-[#4ade80] shadow-[0_0_8px_0_rgba(74,222,128,0.9)] animate-pulse"></div>
+            <span className="text-[#ffffff] text-[14px] font-[500] leading-[20px]">
+              1,204 online
+            </span>
+          </div>
 
-        {/* A pole light sweeping past, like the ones you catch through a train window at night */}
-        {!reduceMotion && (
-          <div
-            className="light-sweep absolute inset-0 -z-[5] pointer-events-none animate-light-sweep"
-            aria-hidden="true"
-          />
-        )}
-      </section>
+          {/* External Links */}
+          <nav className="flex items-center gap-[22px] mr-[max(1rem,env(safe-area-inset-right))]">
+            <a
+              href="https://open.spotify.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center gap-[8px] text-[#ffffff] text-[14px] font-[500] bg-transparent hover:opacity-80 transition-opacity"
+            >
+              Spotify
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="bi bi-spotify"
+                viewBox="0 0 16 16"
+              >
+                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.669 11.538a.5.5 0 0 1-.686.165c-1.879-1.147-4.243-1.407-7.028-.77a.499.499 0 0 1-.222-.973c3.048-.696 5.662-.397 7.77.892a.5.5 0 0 1 .166.686m.979-2.178a.624.624 0 0 1-.858.205c-2.15-1.321-5.428-1.704-7.972-.932a.625.625 0 0 1-.362-1.194c2.905-.881 6.517-.454 8.986 1.063a.624.624 0 0 1 .206.858m.084-2.268C10.154 5.56 5.9 5.419 3.438 6.166a.748.748 0 1 1-.434-1.432c2.825-.857 7.523-.692 10.492 1.07a.747.747 0 1 1-.764 1.288" />
+              </svg>
+            </a>
+            <a
+              href="https://music.youtube.com/watch?v=Mmu-tj-psuk"
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center gap-[8px] text-[#ffffff] text-[14px] font-[500] bg-transparent hover:opacity-80 transition-opacity"
+            >
+              YT Music
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="bi bi-youtube"
+                viewBox="0 0 16 16"
+              >
+                <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z" />
+              </svg>
+            </a>
+          </nav>
+        </header>
 
-      {/* PLAYER DOCK */}
-      <section
-        className="player-dock absolute bottom-0 w-full z-50 flex flex-col md:flex-row items-start md:items-center md:justify-between gap-4 md:gap-6 px-3 sm:px-10 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:pb-8 pt-12 sm:pt-16 bg-gradient-to-t from-black/95 via-black/80 to-transparent text-white"
-        aria-label="Audio player"
-      >
-        {/* Left: track info */}
-        <div className="flex items-center gap-3 sm:gap-4 w-full md:flex-1 justify-start">
-          <div className="artwork-container w-12 h-12 flex-shrink-0 relative hidden sm:block">
-            {/* The Disk Container */}
-            <div className="w-12 h-12 rounded-full overflow-hidden border border-white/20 shadow-lg relative bg-black flex items-center justify-center">
-              {/* The Spinning Image */}
+        {/* Hero Display Headline */}
+
+        {/* Floating Music Player Card */}
+        <div className="flex justify-center pb-[max(3rem,env(safe-area-inset-bottom))]">
+          <div className="group bg-[rgba(0,0,0,0.55)] hover:bg-[rgba(0,0,0,0.7)] backdrop-blur-xl rounded-[9999px] shadow-[0_8px_40px_0_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.15)] hover:shadow-[0_12px_50px_0_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.3)] border border-white/5 hover:border-white/20 transition-all duration-500 ease-out p-[8px_14px_8px_12px] flex items-center gap-[12px] w-[95%] max-w-[420px] relative overflow-hidden">
+            {/* Subtle interactive progress line at the bottom (appears on hover) */}
+            <div className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-transparent via-white/30 to-transparent w-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+            {/* Album Art Thumbnail (Tactile Vinyl Effect) */}
+            <div
+              className={`group/vinyl w-[42px] h-[42px] rounded-[9999px] bg-[#1a1a1a] flex-shrink-0 overflow-hidden border ${playing ? "border-white/30 shadow-[0_0_15px_rgba(255,255,255,0.15)]" : "border-white/10"} transition-all duration-500 relative flex items-center justify-center cursor-pointer`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={currentStation.thumbnail}
-                alt={currentStation.title}
-                className={`w-full h-full object-cover ${playing ? "animate-spin-slow" : "paused"}`}
-                style={{
-                  display: "block",
-                  objectFit: "cover",
-                }}
+                alt="Cover"
+                className={`w-full h-full object-cover group-hover/vinyl:scale-110 transition-transform duration-500 ${playing ? "animate-spin-slow" : "paused"}`}
               />
-
-              {/* The Center Hole (Perfectly Centered) */}
-              <div className="absolute w-3 h-3 bg-[#171126] rounded-full border border-white/20 shadow-inner z-10" />
-            </div>
-          </div>
-          <div className="track-info flex flex-col items-start text-left min-w-0">
-            <strong className="text-sm sm:text-base font-semibold tracking-wide flex items-center gap-2 truncate max-w-[60vw] sm:max-w-xs">
-              <span
-                className={`w-2 h-2 flex-shrink-0 rounded-full ${
-                  playing && boarded
-                    ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse"
-                    : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"
-                }`}
-              ></span>
-              <span className="truncate">{currentStation.title}</span>
-            </strong>
-            <span className="text-xs text-gray-400 mt-0.5 truncate">
-              {isBuffering && boarded ? "Tuning in…" : currentStation.artist}
-            </span>
-          </div>
-        </div>
-
-        {/* Center: Transport Controls + Playback Line */}
-        <div className="transport flex flex-col items-start md:items-center gap-3 w-full md:flex-1">
-          <div className="flex items-center gap-6">
-            <button
-              aria-label="Previous Station"
-              className="hover:bg-white/10 p-2 rounded-full transition-colors active:scale-95"
-              onClick={() => changeStation(-1)}
-            >
-              <SkipBack size={20} fill="currentColor" />
-            </button>
-            <button
-              className="play-button w-14 h-14 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-              aria-label={playing ? "Pause" : "Play"}
-              onClick={() => {
-                clickSound();
-                setPlaying(!playing);
-              }}
-            >
-              {playing ? (
-                <Pause size={24} fill="currentColor" />
-              ) : (
-                <Play size={24} fill="currentColor" className="ml-1" />
-              )}
-            </button>
-            <button
-              aria-label="Next Station"
-              className="hover:bg-white/10 p-2 rounded-full transition-colors active:scale-95"
-              onClick={() => changeStation(1)}
-            >
-              <SkipForward size={20} fill="currentColor" />
-            </button>
-          </div>
-
-          {/* The Playback Progress Line */}
-          <div className="w-full max-w-[200px] h-1 bg-white/20 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-orange-300 transition-all duration-300 ease-linear"
-              style={{ width: `${played * 100}%` }}
-            />
-          </div>
-        </div>
-        {/* Right: volume + chai */}
-        <div className="sound-controls flex items-center justify-start md:justify-end gap-2 sm:gap-4 w-full md:flex-1 px-1 sm:px-0">
-          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
-            <button
-              aria-label={muted ? "Unmute" : "Mute"}
-              className="hover:bg-white/10 p-2 rounded-full transition-colors active:scale-95 flex-shrink-0"
-              onClick={() => {
-                clickSound();
-                setMuted((v) => !v);
-              }}
-            >
-              {muted || volume === 0 ? (
-                <VolumeX size={20} />
-              ) : (
-                <Volume2 size={20} />
-              )}
-            </button>
-            <input
-              aria-label="Volume"
-              type="range"
-              min="0"
-              max="100"
-              className="w-16 xs:w-20 sm:w-28 h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-orange-300"
-              value={muted ? 0 : volume}
-              onChange={(event) => {
-                setVolume(Number(event.target.value));
-                setMuted(false);
-              }}
-            />
-          </div>
-
-          <div className="flex items-center gap-3 relative flex-shrink-0">
-            {floatingChais.map((cup) => (
-              <div
-                key={cup.id}
-                className="absolute text-xl pointer-events-none animate-out fade-out slide-out-to-top-12 duration-1000 ease-out z-20"
-                style={{
-                  left: "50%",
-                  bottom: "100%",
-                  transform: `translateX(calc(-50% + ${cup.x}px))`,
-                }}
-              >
-                ☕️
+              {/* Vinyl Grooves Overlay */}
+              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.4)_100%)] pointer-events-none" />
+              {/* Center Hole */}
+              <div className="absolute w-3.5 h-3.5 bg-[#0a0a0a] rounded-full border border-white/30 shadow-inner z-10 flex items-center justify-center">
+                <div className="w-1 h-1 bg-white/20 rounded-full" />
               </div>
-            ))}
-            <button
-              className="group flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium text-white whitespace-nowrap bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 hover:border-white/40 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 ease-out"
-              onClick={handleChaiClick}
-            >
-              <span className="text-orange-300 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
-                ☕️
-              </span>
-              <span className="tracking-wide hidden xs:inline">Chai</span>
-              <span className="flex items-center justify-center bg-black/30 px-2 py-0.5 rounded-full text-[10px] font-bold border border-white/10 shadow-inner group-hover:bg-black/50 transition-colors duration-300">
-                × {chai}
-              </span>
-            </button>
+            </div>
+
+            {/* Track Info */}
+            <div className="flex flex-col flex-grow justify-center overflow-hidden pr-2">
+              <div className="text-[#ffffff] text-[14px] font-[500] truncate leading-[20px] flex items-center gap-2">
+                {isBuffering && boarded ? (
+                  <span className="flex items-center gap-[3px] py-1">
+                    <span
+                      className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    />
+                    <span
+                      className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    />
+                    <span
+                      className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    />
+                  </span>
+                ) : (
+                  currentStation.title
+                )}
+
+                {/* Micro-interaction: Tiny pulsing equalizer when actively playing */}
+                {playing && !isBuffering && (
+                  <div className="flex items-end gap-[2px] h-[10px] ml-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <span
+                      className="w-[2px] bg-white rounded-t-sm h-[60%] animate-pulse"
+                      style={{ animationDuration: "0.7s" }}
+                    />
+                    <span
+                      className="w-[2px] bg-white rounded-t-sm h-[100%] animate-pulse"
+                      style={{ animationDuration: "0.9s" }}
+                    />
+                    <span
+                      className="w-[2px] bg-white rounded-t-sm h-[80%] animate-pulse"
+                      style={{ animationDuration: "0.8s" }}
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="text-[#ededed] opacity-50 group-hover:opacity-90 transition-opacity duration-300 text-[11px] font-[400] truncate leading-[16.5px]">
+                {currentStation.artist}
+              </div>
+            </div>
+
+            {/* Transport Controls */}
+            <div className="flex items-center gap-[6px] pr-[2px]">
+              <button
+                aria-label="Previous"
+                onClick={() => changeStation(-1)}
+                className="bg-transparent text-white/40 hover:text-white hover:bg-white/10 rounded-full p-1.5 transition-all duration-300 flex items-center justify-center active:scale-90"
+              >
+                <svg
+                  className="w-[18px] h-[18px] fill-current transition-transform active:-translate-x-0.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                </svg>
+              </button>
+
+              <button
+                aria-label={playing ? "Pause" : "Play"}
+                onClick={togglePlay}
+                className="bg-[#ffffff] text-[#000000] rounded-[9999px] p-0 w-[38px] h-[38px] flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_4px_14px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.35)] group/btn"
+              >
+                {playing ? (
+                  <svg
+                    className="w-[16px] h-[16px] fill-current group-hover/btn:scale-90 transition-transform duration-300"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-[16px] h-[16px] fill-current ml-[3px] group-hover/btn:scale-110 transition-transform duration-300"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                )}
+              </button>
+
+              <button
+                aria-label="Next"
+                onClick={() => changeStation(1)}
+                className="bg-transparent text-white/40 hover:text-white hover:bg-white/10 rounded-full p-1.5 transition-all duration-300 flex items-center justify-center active:scale-90"
+              >
+                <svg
+                  className="w-[18px] h-[18px] fill-current transition-transform active:translate-x-0.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* ABOUT MODAL */}
-      {aboutOpen && (
-        <div
-          className="modal-backdrop fixed inset-0 bg-black/60 z-[70] flex items-center justify-center p-4 backdrop-blur-md"
-          onClick={() => setAboutOpen(false)}
-        >
-          <section
-            className="about-modal bg-black/85 backdrop-blur-xl border border-white/20 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[85vh] overflow-y-auto text-white shadow-2xl relative animate-in fade-in zoom-in-95 duration-300"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="about-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              className="modal-close absolute top-4 right-4 w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors active:scale-95"
-              aria-label="Close about"
-              onClick={() => setAboutOpen(false)}
-            >
-              <X size={24} />
-            </button>
-            <span className="eyebrow text-[10px] uppercase tracking-widest opacity-60">
-              est. somewhere between stations
-            </span>
-            <h2
-              id="about-title"
-              className="text-2xl font-bold font-devanagari mt-2 mb-4 pr-8"
-            >
-              SleeperClass
-              <span className="text-orange-300 text-lg font-sans">.wtf</span>
-            </h2>
-            <p className="text-sm opacity-80 mb-6 leading-relaxed">
-              A quiet internet radio for long train journeys, window seats, and
-              the strange peace of watching India go by.
-            </p>
-            <div className="faq-list flex flex-col gap-4">
-              <details open className="border-b border-white/10 pb-4">
-                <summary className="font-semibold cursor-pointer mb-2 hover:text-orange-200 transition-colors">
-                  What is SleeperClass?
-                </summary>
-                <p className="text-sm opacity-70 mt-2">
-                  Ambient music and a digital Indian sleeper coach for
-                  late-night listening.
-                </p>
-              </details>
-              <details className="border-b border-white/10 pb-4">
-                <summary className="font-semibold cursor-pointer mb-2 hover:text-orange-200 transition-colors">
-                  Keyboard shortcuts
-                </summary>
-                <p className="text-sm opacity-70 mt-2">
-                  Space to play or pause, M to mute, A for the ambient mixer,
-                  and the left/right arrows to change stations.
-                </p>
-              </details>
-            </div>
-          </section>
-        </div>
-      )}
-
-      {/* BOARDING OVERLAY — the required first tap that starts playback on landing */}
+      {/* Required Boarding Overlay (to allow autoplay) */}
       {!boarded && (
-        <div className="boarding-overlay absolute inset-0 z-[80] flex flex-col items-center justify-center text-center px-6 bg-black/70 backdrop-blur-md">
-          <span className="eyebrow text-[10px] sm:text-xs uppercase tracking-[0.3em] opacity-60 mb-4">
-            platform 1 · departing now
-          </span>
-          <p className="text-sm sm:text-base text-white/70 max-w-sm mb-8 leading-relaxed">
-            A quiet radio for the journey ahead. Tap to board and the first
-            station starts playing.
-          </p>
+        <div className="absolute inset-0 z-[80] flex flex-col items-center justify-center px-6 bg-black/80 backdrop-blur-md">
           <button
-            className="board-button flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-white/10 backdrop-blur-md border border-white/30 rounded-full text-white font-medium tracking-wide hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.12)]"
+            className="flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 rounded-full text-white font-medium hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.12)]"
             onClick={handleBoard}
             autoFocus
           >
-            <TrainFront size={20} />
             Board the train
           </button>
-          <span className="text-xs text-white/40 mt-4">
-            {currentStation.title} · {currentStation.artist}
-          </span>
         </div>
       )}
 
-      {/* TOAST NOTIFICATION */}
+      {/* Toast Notice */}
       <div
-        className={`toast fixed left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/60 backdrop-blur-xl border border-white/20 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium z-[100] max-w-[90vw] text-center whitespace-nowrap overflow-hidden text-ellipsis shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
-          notice
-            ? "top-[max(5rem,calc(env(safe-area-inset-top)+4.5rem))] opacity-100 scale-100"
-            : "top-10 sm:top-14 opacity-0 scale-95 pointer-events-none"
-        }`}
-        aria-live="polite"
+        className={`toast fixed left-1/2 -translate-x-1/2 flex items-center gap-3 bg-[rgba(0,0,0,0.6)] backdrop-blur-xl border border-white/20 text-white px-6 py-3 rounded-full text-sm font-[500] z-[100] max-w-[90vw] text-center whitespace-nowrap overflow-hidden text-ellipsis shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${notice ? "top-[max(5rem,calc(env(safe-area-inset-top)+4.5rem))] opacity-100 scale-100" : "top-14 opacity-0 scale-95 pointer-events-none"}`}
       >
         <span className="tracking-wide truncate">{notice}</span>
       </div>
 
       <style jsx>{`
-        /* Slow drift + gentle zoom so the window view feels like it's
-            passing by rather than sitting still. Small enough that the
-            -inset-2 buffer on .scene-motion never exposes an edge. */
-        @keyframes train-drift {
-          0% {
-            transform: translate3d(0, 0, 0) scale(1.04);
-          }
-          50% {
-            transform: translate3d(-1.1%, -0.4%, 0) scale(1.07);
-          }
-          100% {
-            transform: translate3d(0, 0, 0) scale(1.04);
-          }
-        }
-        .animate-train-drift {
-          animation: train-drift 26s ease-in-out infinite;
-          will-change: transform;
-        }
-
-        /* A soft diagonal light passing across the window, like a
-            platform lamp or level crossing catching the glass. */
-        .light-sweep {
-          background: linear-gradient(
-            75deg,
-            transparent 42%,
-            rgba(255, 226, 170, 0.16) 48%,
-            rgba(255, 226, 170, 0.28) 50%,
-            rgba(255, 226, 170, 0.16) 52%,
-            transparent 58%
-          );
-          background-size: 300% 100%;
-          background-position: 130% 0;
-        }
-        @keyframes light-sweep {
-          0%,
-          70% {
-            background-position: 130% 0;
-          }
-          85% {
-            background-position: -30% 0;
-          }
-          100% {
-            background-position: -30% 0;
-          }
-        }
-        .animate-light-sweep {
-          animation: light-sweep 9s ease-in infinite;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .animate-train-drift,
-          .animate-light-sweep {
-            animation: none;
-          }
-        }
         @keyframes spin {
           from {
             transform: rotate(0deg);
@@ -1190,23 +1049,11 @@ export default function Page() {
             transform: rotate(360deg);
           }
         }
-
         .animate-spin-slow {
           animation: spin 10s linear infinite;
         }
-
-        /* This pauses the spinning when the music is paused */
         .paused {
           animation-play-state: paused;
-        }
-        .artwork img {
-          display: block;
-          min-width: 100%;
-          min-height: 100%;
-          max-width: none;
-        }
-        .artwork-container img {
-          object-position: center center;
         }
       `}</style>
     </main>
